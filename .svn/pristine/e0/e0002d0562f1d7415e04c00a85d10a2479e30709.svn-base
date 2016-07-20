@@ -1,0 +1,181 @@
+
+$(document).ready(function(){
+    
+    // dataPoints
+    var dataPoints1 = [];
+    var dataPoints2 = [];
+
+
+    var pulsChart = new CanvasJS.Chart("chartContainer", {
+        zoomEnabled: true,
+        title: {
+            text: "Demo Chart"
+        },
+        toolTip: {
+            shared: true
+
+        },
+        legend: {
+            verticalAlign: "top",
+            horizontalAlign: "center",
+            fontSize: 14,
+            fontWeight: "bold",
+            fontFamily: "calibri",
+            fontColor: "dimGrey"
+        },
+        axisX: {
+            title: "chart updates every 1 secs"
+        },
+        axisY: {
+            prefix: '',
+            includeZero: false
+        },
+        data: [{
+                // dataSeries1
+                type: "line",
+                xValueType: "dateTime",
+                showInLegend: true,
+                name: "Pacient 1",
+                dataPoints: dataPoints1
+            },
+            {
+                // dataSeries2
+                type: "line",
+                xValueType: "dateTime",
+                showInLegend: true,
+                name: "Pacient 2",
+                dataPoints: dataPoints2
+            }],
+        legend:{
+            cursor: "pointer",
+            itemclick: function (e) {
+                if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                    e.dataSeries.visible = false;
+                }
+                else {
+                    e.dataSeries.visible = true;
+                }
+                pulsChart.render();
+            }
+        }
+    });
+
+
+
+    var updateInterval = 3000;
+    // initial value
+    var yValue1 = 640;
+    var yValue2 = 604;
+
+    var time = new Date;
+    time.setHours(9);
+    time.setMinutes(30);
+    time.setSeconds(00);
+    time.setMilliseconds(00);
+    // starting at 9.30 am
+
+
+
+
+
+var updateChart = function (count) {
+    count = count || 1;
+
+    // count is number of times loop runs to generate random dataPoints. 
+
+    for (var i = 0; i < count; i++) {
+
+        // add interval duration to time				
+        time.setTime(time.getTime() + updateInterval);
+
+
+        // generating random values
+        var deltaY1 = .5 + Math.random() * (-.5 - .5);
+        var deltaY2 = .5 + Math.random() * (-.5 - .5);
+
+        // adding random value and rounding it to two digits. 
+        yValue1 = Math.round((yValue1 + deltaY1) * 100) / 100;
+        yValue2 = Math.round((yValue2 + deltaY2) * 100) / 100;
+
+        // pushing the new values
+        dataPoints1.push({
+            x: time.getTime(),
+            y: yValue1
+        });
+        dataPoints2.push({
+            x: time.getTime(),
+            y: yValue2
+        });
+
+    };
+    
+    // updating legend text with  updated with y Value 
+    pulsChart.options.data[0].legendText = " Pacient 1 " + yValue1;
+    pulsChart.options.data[1].legendText = " Pacient 1 " + yValue2;
+
+    pulsChart.render();
+
+};
+
+// generates first set of dataPoints 
+updateChart(3000);	
+
+// update chart after specified interval 
+setInterval(function(){updateChart();}, updateInterval);
+
+
+	
+
+var createAbsoluteDiv = function(buttonVal){
+            if (!$('#absoluteDiv').length)
+            {
+                $('body').append('<div id="absoluteDiv" class="absoluteDiv">\n\
+                                    <p><div id="xButton" class="xButton"><img src="../public/img/x.png"</div></p> <br/>\n\
+                                    <div id="absoluteDivContent" style=""></div>\n\
+                                  </div>');
+                
+                $('#absoluteDivContent').css('height', '80%');
+                
+                $('#xButton').click(function(){ //close button event
+                    $('#absoluteDiv').animate(
+                            {opacity: '0', width: '0%', height: '0%'}, //properties
+                            'slow', //duration
+                            function(){  // third param is a callback function
+                                $('#absoluteDiv').remove();
+                            }
+                    ); 
+                });
+                
+                if ($(window).width()>980){
+                    $('#absoluteDiv').animate({opacity: '1', width: '60%', height: '80%'}, "slow"); // show absolute Div
+                }else if ($(window).width()<=480){
+                    $('#absoluteDiv').animate({opacity: '1', width: '90%', height: '80%'}, "slow");
+                }else if ($(window).width()<=700){
+                    $('#absoluteDiv').animate({opacity: '1', width: '70%', height: '80%'}, "slow");
+                }else if ($(window).width()<=980){
+                    $('#absoluteDiv').animate({opacity: '1', width: '60%', height: '50%'}, "slow");
+                }
+
+                
+                          
+                // get and post the content
+                if (buttonVal == 'Contact')
+                {
+                    url = 'src/ContactForm.php';
+                    this.ajaxRequest(self, url, 'HTML', this.contactCallBack);
+                }
+                
+                if (buttonVal == 'ourJobs')
+                {
+                    url = 'src/getJobs.php';
+                    this.ajaxRequest(self, url, 'JSON', this.ourJobsCallBack);
+                }
+                
+            }
+    }
+    
+    
+    $('#test').click(function(){
+       createAbsoluteDiv(1); 
+    });
+});

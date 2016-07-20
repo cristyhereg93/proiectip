@@ -1,0 +1,41 @@
+<html>
+    <head>
+        <title>HearTracked</title>
+        
+        <link href="Doctor/customCSS/forms.css" type="text/css" rel='stylesheet'/>
+    </head>
+    <body>
+        <header><img src="public/img/logo.jpg" width="150px"/></header>
+        <hr/><br/>
+        <div id='login'>
+            <table align='center' >
+                <tr>
+                    <td colspan="2" align = "center">LOGIN</td>
+                </tr>
+                <tr>
+                    <?php
+                        session_start();
+                        if (isset($_SESSION['SESS_ERR']))
+                        {
+                            echo "<td colspan='2'><font color='red'>".$_SESSION['SESS_ERR']."</font></td>";
+                            unset($_SESSION['SESS_ERR']);
+                        }
+                        unset($_SESSION['SESS_USER']);
+                    ?>
+                </tr>
+                <form method='POST' action='checkLogin.php' >
+                    <tr>  
+                        <td> <input type="text" name ="username" id ="username" placeholder="Username" aria-describedby="basic-addon1"/></td>
+                    </tr>
+                    <tr>
+                        <td> <input type='password' id='password' name='password' placeholder="Password" aria-describedby="basic-addon1"/></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" align='center'><input class="submit" type='submit' value="Submit"/></td>
+                    </tr>
+                </form>
+            </table>
+        </div>
+    </body>
+</html>
+

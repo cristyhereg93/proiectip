@@ -1,0 +1,236 @@
+
+$(document).ready(function () {
+    var dps = [];
+    var dps2 = [];
+    
+    //get all Patients
+    var params = {"id" : $('#userID').val()};
+    $.ajax({
+        url: 'src/getAllPatients.php',
+        type: 'POST',
+        data: params,
+        datatype: 'JSON',
+        success: function(data){
+            if (data != 0)
+            {
+                var data = $.parseJSON(data);
+                    var table = "";
+                    table += "<tr><th>FirstName</th> <th>Last Name</th> <th>CNP</th> <th>Job</th> <th>Profession</th> <th>EMail</th> <th>Age</th> <th>Phone</th> <th>Actions</th> </tr>";
+                    $.each(data, function(index,value){
+                        dps.push({label: String(value['first_name']), y: 0});         
+                        dps2.push({label: String(value['first_name']), y: 0});
+                        
+                        table += "<tr class='hoverRow'>";
+                        $.each(value, function(id, val){
+                            table += "<td>" + val + "</td>";
+                        });
+                        table += "<td><button id='stergePacient' class='stergePacient submit' style='height: 30px;' value='" + index + "'>Sterge</button>";
+                        table += "<button id='scrieRecomandare' class='scrieRecomandare submit' style='height: 30px;' value='" + index + "'>ScrieRecomandare</button>";
+                        table += "<button id='vizualizeazaRecomandari' class='vizualizeazaRecomandari submit' style='height: 30px;' value='" + index + "'>VizualizeazaRecomandari</button></td>";
+                        table += "</tr>";
+                    });
+                    
+                    $('#loadingGif').html('');
+                    $('#hoverTable').html(table);
+                        
+                    $('.stergePacient').click(function(){
+                        var PUserId = $(this).val();
+                        $.ajax({
+                            url: "src/deletePacient.php",
+                            type: "POST",
+                            data: {id: PUserId},
+                            datatype: 'HTML',
+                            success: function (data) {
+                                if (data == 1)
+                                {
+                                    alert('Success !');
+                                    location.reload();
+                                }
+                            }
+                        });
+                    });
+                    
+                    $('.scrieRecomandare').click(function(){
+                        var PUserId = $(this).val();
+                        $('#PUserIDR').val(PUserId);
+                        $('#wroteRecomandationForm').show();
+                        $('#addPacientForm').hide();
+                        $('#addDoctorForm').hide();
+                        $('#pacientsTable').hide();
+                        $('#chartContainer').hide();
+                        $('#ECGChartContainer').hide();
+                    });
+                    
+                    $('.vizualizeazaRecomandari').click(function(){
+                        var PUserId = $(this).val();
+                        createAbsoluteDiv('showRecomandations',PUserId);
+                    });
+            }
+            else
+            {
+                    $('#loadingGif').html('');
+                    $('#hoverTable').html ('No Pacients !');
+            }
+        }
+    });
+    
+    
+
+    var chart = new CanvasJS.Chart("chartContainer", {
+        animationEnabled: true,
+        exportEnabled: true,
+        zoomEnabled:true,
+        title: {
+            text: "Details for your pacients",
+            margin: 25
+        },
+        axisY: {
+            title: "Temperature",
+            suffix: " C"
+        },
+        axisY2: {
+            title: "Pulse",
+            suffix: " BPM"
+        },
+        legend: {
+            verticalAlign: 'bottom',
+            horizontalAlign: "center"
+        },
+        data: [
+            {
+                type: "column",
+                bevelEnabled: true,
+                showInLegend: true,
+                legendText: "Temperature",
+                indexLabel: "{y} C",
+                dataPoints: dps
+            },
+            {
+                type: "column",
+                axisYType: "secondary",
+                bevelEnabled: true,
+                showInLegend: true,
+                legendText: "Pulse",
+                indexLabel: "{y} bpm",
+                dataPoints: dps2               
+            }
+        ],
+        legend:{
+            cursor:"pointer",
+            itemclick: function(e){
+              if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+              	e.dataSeries.visible = false;
+              }
+              else {
+                e.dataSeries.visible = true;
+              }
+            	chart.render();
+            }
+          },
+    });
+
+
+    var updateInterval = 2000;
+
+    var updateChart = function (data) {
+
+        for (var i = 0; i < dps.length; i++) {
+
+            // generating random variation deltaY
+            var boilerColor;
+
+            $.each(data, function (key, value) {
+                if (key == 'Temp')
+                {
+                    $.each (value, function(key1, value1){
+                        yVal = value1;
+                        label = key1;
+
+                        // color of dataPoint dependent upon y value. 
+
+                        boilerColor =
+                                yVal > 38 ? "#FF2500" :
+                                yVal >= 37 ? "#6B8E23" :
+                                yVal < 37 ? "#12059e" :
+                                null;
+
+
+                        // updating the dataPoint
+                        if (dps[i]['label'] == label)
+                        {
+                            dps[i] = {label: label, y: yVal, color: boilerColor};
+                        }
+                    }); 
+                }else{
+                    $.each (value, function(key1, value1){
+                        yVal = value1;
+                        label = key1;
+
+                        // color of dataPoint dependent upon y value. 
+
+                        boilerColor =
+                                yVal > 100 ? "#FF2500" :
+                                yVal > 80 ? "#6B8E23" :
+                                yVal <= 80 ? "#6B8E23" :
+                                null;
+
+
+                        // updating the dataPoint
+                        if (dps2[i]['label'] == label)
+                        {
+                            dps2[i] = {label: label, y: yVal, color: boilerColor};
+                        }
+                    }); 
+                }
+            });
+
+        }
+        ;
+
+        chart.render();
+    };
+
+
+    // update chart after specified interval 
+    setInterval(function() {
+        $.ajax({
+            url: 'getDBdata.php',
+            type: "POST",
+            data: params,
+            datatype: 'JSON',
+            success: function (data) {
+                var json = $.parseJSON(data);
+                updateChart(json);
+            }
+        });
+    }, updateInterval);
+
+    
+    // BUTOANE
+    $('#addPacient').click(function(){
+        $('#addPacientForm').show();
+        $('#addDoctorForm').hide();
+        $('#pacientsTable').hide();
+        $('#chartContainer').hide();
+        $('#ECGChartContainer').hide();
+        $('#wroteRecomandationForm').hide();
+    });
+    
+    $('#showGraphic').click(function(){
+        $('#addPacientForm').hide();
+        $('#addDoctorForm').hide();
+        $('#wroteRecomandationForm').hide();
+        $('#pacientsTable').show();
+        $('#chartContainer').show();
+        $('#ECGChartContainer').show();
+    });
+    
+    $('#addDoctor').click(function(){
+        $('#addDoctorForm').show();
+        $('#addPacientForm').hide();
+        $('#wroteRecomandationForm').hide();
+        $('#pacientsTable').hide();
+        $('#chartContainer').hide();
+        $('#ECGChartContainer').hide();
+    });  
+});

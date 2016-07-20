@@ -1,0 +1,122 @@
+
+$(document).ready(function () {
+    var dps = [];
+    
+    //get all Patients
+    var params = {"id" : $('#userID').val()};
+    $.ajax({
+        url: 'src/getAllPatients.php',
+        type: 'POST',
+        data: params,
+        datatype: 'JSON',
+        success: function(data){
+            if (data != 0)
+            {
+                var data = $.parseJSON(data);
+                    var table = "";
+                    table += "<tr><th>FirstName</th> <th>Last Name</th> <th>CNP</th> <th>Job</th> <th>Profession</th> <th>EMail</th> <th>Age</th> <th>Phone</th></tr>";
+                    $.each(data, function(index,value){
+                        dps.push({label: String(value['first_name']), y: 0});         
+                        
+                        table += "<tr class='hoverRow'>";
+                        $.each(value, function(id, val){
+                            table += "<td>" + val + "</td>";
+                        });
+                        table += "</tr>";
+                    });
+
+                    $('#hoverTable').html (table);
+                    
+            }
+            else
+            {
+                    $('#hoverTable').html ('No Pacients !');
+            }
+        }
+    });
+    
+    
+
+    var chart = new CanvasJS.Chart("chartContainer", {
+        title: {
+            text: "Temperature of Each Pacient"
+        },
+        axisY: {
+            suffix: " C"
+        },
+        legend: {
+            verticalAlign: 'bottom',
+            horizontalAlign: "center"
+        },
+        data: [
+            {
+                type: "column",
+                bevelEnabled: true,
+                indexLabel: "{y} C",
+                dataPoints: dps
+            }
+        ]
+    });
+
+
+    var updateInterval = 2000;
+
+    var updateChart = function (data) {
+
+        for (var i = 0; i < dps.length; i++) {
+
+            // generating random variation deltaY
+            var boilerColor;
+
+            $.each(data, function (key, value) {
+                
+                $.each (value, function(key1, value1){
+                    console.log(key1+'  '+value1);
+                    yVal = value1;
+                    label = key1;
+                
+                    // color of dataPoint dependent upon y value. 
+
+                    boilerColor =
+                            yVal > 39 ? "#FF2500" :
+                            yVal > 37 ? "#FF6000" :
+                            yVal <= 37 ? "#6B8E23 " :
+                            null;
+
+
+                    // updating the dataPoint
+                    if (dps[i]['label'] == label)
+                    {
+                        dps[i] = {label: label, y: yVal, color: boilerColor};
+                    }
+                }); 
+            });
+
+        }
+        ;
+
+        chart.render();
+    };
+
+
+// update chart after specified interval 
+    setInterval(function () {
+        $.ajax({
+            url: 'getDBdata.php',
+            type: "POST",
+            data: params,
+            datatype: 'JSON',
+            success: function (data) {
+                var json = $.parseJSON(data);
+                updateChart(json);
+            }
+        });
+    }, updateInterval);
+
+    
+    
+    $('#test').click(function(){
+        alert('merge');
+    });
+
+});

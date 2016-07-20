@@ -1,0 +1,38 @@
+<?php
+require_once 'config.php';
+
+session_start();
+unset($_SESSION['SESS_ERR']);
+
+$username = $_POST['username'];
+$password = $_POST['password'];
+
+
+if (empty($username) || empty($password)) {
+    $_SESSION['SESS_ERR'] = 'Please fill all forms !';
+    session_write_close();
+    header('location: index.php');
+}
+
+
+$password = hash('sha256', $password);
+$apiRequest = 'http://medsoftapi.cloudapp.net/api/Identities/CheckCredentials?username='.$username.'&password='.$password;
+
+$result = json_decode(file_get_contents($apiRequest),true);
+
+
+if (empty($result)) {
+    $_SESSION['SESS_ERR'] = 'Invalid username or password !';
+    header('location: index.php');
+} else {
+    $_SESSION['SESS_USER'] = $username;
+    if ($result['Role'] == 'doctor')
+    {
+        header('location: Doctor/index.php');
+    }elseif ($result['Role'] == 'pacient'){
+        header('location: Pacient/index.php');
+    }
+}
+?>
+
+

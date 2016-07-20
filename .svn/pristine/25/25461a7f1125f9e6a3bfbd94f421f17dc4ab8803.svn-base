@@ -1,0 +1,47 @@
+<?php
+echo "<font color='white'>Add New Pacient</font>";
+echo '<hr/>
+    <table align="center" >
+    <form method="POST" action="src/addNewPacient.php">
+        <tr>
+            <td><input type="text" name ="FirstName" id ="FirstName" placeholder="First Name" aria-describedby="basic-addon1"/></td>
+        </tr>
+        <tr>
+            <td><input type="text" name ="LastName" id ="LastName" placeholder="Last Name" aria-describedby="basic-addon1"/></td>
+        </tr>
+        <tr>
+            <td><input type="email" name ="EMail" id ="EMail" placeholder="E-Mail" aria-describedby="basic-addon1"/></td>
+        </tr>
+        <tr>
+            <td><input type="text" name ="CNP" id ="CNP" placeholder="CNP" aria-describedby="basic-addon1"/></td>
+        </tr>
+        <tr>
+            <td><input type="text" name ="Job" id ="Job" placeholder="Job" aria-describedby="basic-addon1"/></td>
+        </tr>
+        <tr>
+            <td><input type="text" name ="Profession" id ="Profession" placeholder="Profession" aria-describedby="basic-addon1"/></td>
+        </tr>
+        <tr>
+            <td><input type="text" name ="Phone" id ="Phone" placeholder="Phone Number" aria-describedby="basic-addon1"/></td>
+        </tr>
+        <tr>
+            <td><input type="text" name ="Age" id ="Age" placeholder="Age" aria-describedby="basic-addon1"/></td>
+        </tr>
+        
+        <tr>
+            <td><input type="text" name ="Username" id ="Username" placeholder="Username" aria-describedby="basic-addon1"/></td>
+        </tr>  
+        <tr>
+            <td><input type="password" id="password" name="password" placeholder="Password" aria-describedby="basic-addon1" /></td>
+        </tr>
+        <tr>
+            <td><input type="password" id="r_password" name="r_password" placeholder="Repeat Password" aria-describedby="basic-addon1" /></td>
+        </tr>
+        <tr>
+            <td colspan="2" align="right"><input type="submit" value="Submit"/></td>
+        </tr>
+
+    </form>
+    </table>';
+        
+?>

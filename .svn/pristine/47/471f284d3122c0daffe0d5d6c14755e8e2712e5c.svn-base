@@ -1,0 +1,4 @@
+<?php
+define ('API_HOST', 'http://medsoftapi.cloudapp.net/api/Identities/');
+
+?>

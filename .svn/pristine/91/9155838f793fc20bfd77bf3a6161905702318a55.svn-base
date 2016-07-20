@@ -1,0 +1,22 @@
+<?php
+define ('HOST', "tcp:y2lbcfgo5u.database.windows.net,1433");
+
+$tables = array(
+    'identity' => '[Identity]',
+    'doctor' => '[Doctor]',
+    'patient' => '[Patient]',
+    'activity' => '[ActivityTracking]',
+    'address' => '[Address]',
+    'medicalReport' => '[MedicalReport]',
+    'alarms' => '[Alarms]'
+);
+
+$connectionInfo = array("UID" => "medsoft@y2lbcfgo5u", "pwd" => "MasonNo1", "Database" => "Medsoft", "LoginTimeout" => 60, "Encrypt" => 1);
+    
+$conn = sqlsrv_connect(HOST, $connectionInfo); //sql var
+
+if( !$conn ) {
+    echo "Connection could not be established.<br />";
+    echo "<pre>"; die( print_r( sqlsrv_errors(), true));
+}
+?>
